@@ -29,7 +29,7 @@ end
 ```
 
 ### Configuración inicial de los archivos de Nginx
-1. Hemos creado una carpeta llamada **mblesaweb** dentro de var/www/ con una carpeta **html** dentro
+1. Hemos creado una carpeta llamada **mblesaweb** dentro de _var/www/_ con una carpeta **html** dentro
 2. Instalando git previamente, hemos clonado dentro de **html** el repositorio de git: _https://github.com/cloudacademy/static-website-example_
 3. Hemos modificado los permisos de las carpetas de tal forma que: 
 - El propietario de la carpeta **html** y de todo el contenido de ella sea _www-data_
@@ -56,10 +56,10 @@ end
     SHELL
 ```
 ### Configuración del archivo default de Nginx
-1. Hemos sacado el archivo default de /etc/nginx/sites-available para su configuración
-2. Hemos configurado el archivo default en función de las especificaciones requeridas para nuestra web
-3. Hemos copiado el archivo default en la máquina virtual tras su configuración
-4. Hemos creado un archivo simbólico entre el archivo default y los sitios habilitados
+1. Hemos sacado el archivo default de _/etc/nginx/sites-available_ para su configuración
+2. Hemos configurado el archivo _default_ en función de las especificaciones requeridas para nuestra web
+3. Hemos copiado el archivo _default_ en la máquina virtual tras su configuración
+4. Hemos creado un archivo simbólico entre el archivo _default_ y los sitios habilitados
 - El archivo default:
 ```
 server {
