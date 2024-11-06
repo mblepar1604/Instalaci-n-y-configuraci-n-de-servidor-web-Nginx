@@ -44,6 +44,12 @@ Vagrant.configure("2") do |config|
       -keyout /etc/ssl/private/vsftpd.key -out /etc/ssl/certs/vsftpd.crt \
       -subj "/C=ES/ST=Madrid/L=Madrid/O=mblesaweb/CN=mblesaweb.es"
 
+      # Pegamos el archivo vsftpd.conf
+      sudo cp /vagrant/vsftpd.conf /etc
+
+      # Reiniciamos el servicio
+      sudo systemctl restart vsftp
+
     SHELL
 
   end
