@@ -55,7 +55,7 @@ end
 
     SHELL
 ```
-### Creación de archivo de configuración de Nginx
+### Configuración del archivo default de Nginx
 1. Hemos sacado el archivo default de /etc/nginx/sites-available para su configuración
 2. Hemos configurado el archivo default en función de las especificaciones requeridas para nuestra web
 3. Hemos copiado el archivo default en la máquina virtual tras su configuración
