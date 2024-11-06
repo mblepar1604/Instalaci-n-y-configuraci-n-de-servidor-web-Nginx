@@ -156,4 +156,49 @@ ff02::2		ip6-allrouters
 
     SHELL
 ```
-### Comprobar registros del servidor
+## FTPS
+En esta sección veremos toda la configuración relacionada al servidor **FTPS**
+### Instalación y preparación inicial del servidor FTPS
+1. Instalamos el servicio FTPS: _vsftpd_
+2. Creamos una carpeta en nuestro home para el servicio.
+3. Creamos los certificados de seguridad necesarios
+```
+# Instalación del servicio Nginx y configuración de este
+    vm1.vm.provision "shell", inline: <<-SHELL
+
+      sudo apt-get update
+      sudo apt-get install -y nginx
+      sudo apt-get install -y git
+      sudo apt-get install -y vsftpd
+
+      # Creación de la carpeta del sitio web
+      sudo mkdir -p /var/www/mblesaweb/html
+
+      # Dentro de esa carpeta html, clonamos el siguiente repositorio
+      cd /var/www/mblesaweb/html
+      sudo git clone https://github.com/cloudacademy/static-website-example
+
+      # Ajustamos los permisos de la carpeta
+      sudo chown -R www-data:www-data /var/www/mblesaweb/html
+      sudo chmod -R 755 /var/www/mblesaweb
+
+      # Pegamos el archivo default
+      sudo mkdir -p /etc/nginx/sites-available/mblesaweb
+      sudo cp /vagrant/default /etc/nginx/sites-available/mblesaweb
+
+      # Creamos un archivo simbólico entre el archivo default y los sitios habilitados
+      sudo ln -s /etc/nginx/sites-available/ /etc/nginx/sites-enabled/
+
+      # Pegamos el archivo hosts
+      sudo cp /vagrant/hosts /etc
+
+      # Creamos una carpeta en nuestro home (ftp)
+      sudo mkdir -p /home/vagrant/ftp
+
+      # Creamos los certificados de seguridad
+      sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+      -keyout /etc/ssl/private/vsftpd.key -out /etc/ssl/certs/vsftpd.crt \
+      -subj "/C=ES/ST=Madrid/L=Madrid/O=mblesaweb/CN=mblesaweb.es"
+
+    SHELL
+```

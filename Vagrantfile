@@ -13,6 +13,7 @@ Vagrant.configure("2") do |config|
       sudo apt-get update
       sudo apt-get install -y nginx
       sudo apt-get install -y git
+      sudo apt-get install -y vsftpd
 
       # Creación de la carpeta del sitio web
       sudo mkdir -p /var/www/mblesaweb/html
@@ -26,13 +27,22 @@ Vagrant.configure("2") do |config|
       sudo chmod -R 755 /var/www/mblesaweb
 
       # Pegamos el archivo default
-      sudo cp /vagrant/default /etc/nginx/sites-available
+      sudo mkdir -p /etc/nginx/sites-available/mblesaweb
+      sudo cp /vagrant/default /etc/nginx/sites-available/mblesaweb
 
       # Creamos un archivo simbólico entre el archivo default y los sitios habilitados
       sudo ln -s /etc/nginx/sites-available/ /etc/nginx/sites-enabled/
 
       # Pegamos el archivo hosts
       sudo cp /vagrant/hosts /etc
+
+      # Creamos una carpeta en nuestro home (ftp)
+      sudo mkdir -p /home/vagrant/ftp
+
+      # Creamos los certificados de seguridad
+      sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+      -keyout /etc/ssl/private/vsftpd.key -out /etc/ssl/certs/vsftpd.crt \
+      -subj "/C=ES/ST=Madrid/L=Madrid/O=mblesaweb/CN=mblesaweb.es"
 
     SHELL
 
