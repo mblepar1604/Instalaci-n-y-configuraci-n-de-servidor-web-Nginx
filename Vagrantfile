@@ -25,12 +25,14 @@ Vagrant.configure("2") do |config|
       sudo chown -R www-data:www-data /var/www/mblesaweb/html
       sudo chmod -R 755 /var/www/mblesaweb
 
-      # Copiamos y pegamos la carpeta default
-      cp /etc/nginx/sites-available/default /vagrant
-      cp /vagrant/default /etc/nginx/sites-available
+      # Pegamos el archivo default
+      sudo cp /vagrant/default /etc/nginx/sites-available
 
       # Creamos un archivo simbólico entre el archivo default y los sitios habilitados
       sudo ln -s /etc/nginx/sites-available/ /etc/nginx/sites-enabled/
+
+      # Pegamos el archivo hosts
+      sudo cp /vagrant/hosts /etc
 
     SHELL
 

@@ -100,12 +100,60 @@ server {
       sudo chown -R www-data:www-data /var/www/mblesaweb/html
       sudo chmod -R 755 /var/www/mblesaweb
 
-      # Copiamos y pegamos la carpeta default
-      cp /etc/nginx/sites-available/default /vagrant
-      cp /vagrant/default /etc/nginx/sites-available
+      # Pegamos el archivo default
+      sudo cp /vagrant/default /etc/nginx/sites-available
 
       # Creamos un archivo simbólico entre el archivo default y los sitios habilitados
       sudo ln -s /etc/nginx/sites-available/ /etc/nginx/sites-enabled/
 
     SHELL
 ```
+
+## Comprobaciones de Nginx
+### Comprobación del correcto funcionamiento
+Como no poseemos **DNS**, lo haremos de forma manual. Vamos a editar el archivo _/etc/hosts_ de nuestra máquina virtual
+para que asocie la IP de esta a nuestro **server_name**. Para ello:
+1. Sacaremos el archivo a nuestro repositorio local mediante: _sudo cp /etc/hosts /vagrant_
+2. Le añadiremos la siguiente linea: _192.168.57.15 mblesaweb_
+3. Pegamos el archivo hosts de nuevo a la máquina virtual mediante: _sudo cp /vagrant/hosts /etc_
+- En el archivo hosts:
+```
+127.0.0.1	localhost
+127.0.0.2	bookworm
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+192.168.57.15 mblesaweb
+```
+- En el archivo vagrantfile:
+```
+# Instalación del servicio Nginx y configuración de este
+    vm1.vm.provision "shell", inline: <<-SHELL
+
+      sudo apt-get update
+      sudo apt-get install -y nginx
+      sudo apt-get install -y git
+
+      # Creación de la carpeta del sitio web
+      sudo mkdir -p /var/www/mblesaweb/html
+
+      # Dentro de esa carpeta html, clonamos el siguiente repositorio
+      cd /var/www/mblesaweb/html
+      sudo git clone https://github.com/cloudacademy/static-website-example
+
+      # Ajustamos los permisos de la carpeta
+      sudo chown -R www-data:www-data /var/www/mblesaweb/html
+      sudo chmod -R 755 /var/www/mblesaweb
+
+      # Pegamos el archivo default
+      sudo cp /vagrant/default /etc/nginx/sites-available
+
+      # Creamos un archivo simbólico entre el archivo default y los sitios habilitados
+      sudo ln -s /etc/nginx/sites-available/ /etc/nginx/sites-enabled/
+
+      # Pegamos el archivo hosts
+      sudo cp /vagrant/hosts /etc
+
+    SHELL
+```
+### Comprobar registros del servidor
