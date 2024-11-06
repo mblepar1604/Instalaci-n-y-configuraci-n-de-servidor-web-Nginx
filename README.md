@@ -1,7 +1,9 @@
 # CONFIGURACION DE ARCHIVOS
-1. Configuracion del archivo vagrantfile
-    - Configuración básica de vagrant
-        Se ha creado la siguiente configuración basica del vagrantfile
+## Configuracion del archivo vagrantfile
+En esta sección estará todo lo relacionado a la configuración del archivo Vagrantfile.
+### Configuración básica de vagrant
+Hemos creado una configuración básica del archivo añadiendo el sistema y una provisión que instala el servicio Nginx.
+La estructura ha quedado tal que así:
 
 ```
     Vagrant.configure("2") do |config|
