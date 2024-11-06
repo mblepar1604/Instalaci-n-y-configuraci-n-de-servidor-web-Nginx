@@ -5,14 +5,14 @@ Vagrant.configure("2") do |config|
     vm1.vm.box = "debian/bookworm64"
 
     # Le añadimos una red privada
-    vm1.vm.network "private_network", ip: "192.168.57.11"
+    vm1.vm.network "private_network", ip: "192.168.57.15"
 
     # Instalación del servicio Nginx y configuración de este
     vm1.vm.provision "shell", inline: <<-SHELL
 
       sudo apt-get update
       sudo apt-get install -y nginx
-      systemctl status nginx
+      sudo apt-get install -y git
 
       # Creación de la carpeta del sitio web
       sudo mkdir -p /var/www/mblesaweb/html
@@ -24,6 +24,13 @@ Vagrant.configure("2") do |config|
       # Ajustamos los permisos de la carpeta
       sudo chown -R www-data:www-data /var/www/mblesaweb/html
       sudo chmod -R 755 /var/www/mblesaweb
+
+      # Copiamos y pegamos la carpeta default
+      cp /etc/nginx/sites-available/default /vagrant
+      cp /vagrant/default /etc/nginx/sites-available
+
+      # Creamos un archivo simbólico entre el archivo default y los sitios habilitados
+      sudo ln -s /etc/nginx/sites-available/ /etc/nginx/sites-enabled/
 
     SHELL
 
