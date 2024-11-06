@@ -1,10 +1,9 @@
-# --------------------- INDICE ---------------------
-1. CONFIGURACIÓN DE ARCHIVOS
+# CONFIGURACION DE ARCHIVOS
+1. Configuracion del archivo vagrantfile
     - Configuración básica de vagrant
         Se ha creado la siguiente configuración basica del vagrantfile
 
     Vagrant.configure("2") do |config|
-
         config.vm.define "vm1" do |vm1|
 
             vm1.vm.box = "debian/bookworm64"
@@ -15,5 +14,4 @@
             SHELL
 
         end
-        
     end
