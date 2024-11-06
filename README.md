@@ -268,7 +268,7 @@ local_root=/home/nombre_usuario/ftp
       sudo cp /vagrant/vsftpd.conf /etc
 
       # Reiniciamos el servicio
-      sudo systemctl restart vsftp
+      sudo systemctl restart vsftpd
 
     SHELL
 ```
