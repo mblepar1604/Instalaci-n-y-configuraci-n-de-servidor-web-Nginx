@@ -23,18 +23,21 @@ Vagrant.configure("2") do |config|
       sudo git clone https://github.com/cloudacademy/static-website-example
 
       # Ajustamos los permisos de la carpeta
-      sudo chown -R www-data:www-data /var/www/mblesaweb/html
-      sudo chmod -R 755 /var/www/mblesaweb
+      sudo chown -R www-data:www-data /var/www/mblesaweb/html/static-website-example
+      sudo chmod -R 755 /var/www/mblesaweb/html
 
       # Pegamos el archivo default
       sudo mkdir -p /etc/nginx/sites-available/mblesaweb
-      sudo cp /vagrant/default /etc/nginx/sites-available/mblesaweb
+      sudo cp /vagrant/webMartin /etc/nginx/sites-available/mblesaweb
 
       # Creamos un archivo simbólico entre el archivo default y los sitios habilitados
-      sudo ln -s /etc/nginx/sites-available/ /etc/nginx/sites-enabled/
+      sudo ln -sf /etc/nginx/sites-available/mblesaweb /etc/nginx/sites-enabled/
 
       # Pegamos el archivo hosts
       sudo cp /vagrant/hosts /etc
+
+      # Reiniciamos el servicio de Nginx
+      sudo systemctl restart nginx
 
       # Creamos una carpeta en nuestro home (ftp)
       sudo mkdir -p /home/vagrant/ftp
