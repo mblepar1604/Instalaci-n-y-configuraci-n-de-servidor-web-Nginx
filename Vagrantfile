@@ -26,8 +26,7 @@ Vagrant.configure("2") do |config|
       sudo chown -R www-data:www-data /var/www/mblesaweb/html/static-website-example
       sudo chmod -R 755 /var/www/mblesaweb/html
 
-      # Pegamos el archivo default
-      sudo mkdir -p /etc/nginx/sites-available/mblesaweb
+      # Pegamos el archivo webMartin
       sudo cp /vagrant/webMartin /etc/nginx/sites-available/mblesaweb
 
       # Creamos un archivo simbólico entre el archivo default y los sitios habilitados
@@ -36,7 +35,8 @@ Vagrant.configure("2") do |config|
       # Pegamos el archivo hosts
       sudo cp /vagrant/hosts /etc
 
-      # Reiniciamos el servicio de Nginx
+      # Verificamos y reiniciamos el servicio de Nginx
+      sudo nginx -t
       sudo systemctl restart nginx
 
       # Creamos una carpeta en nuestro home (ftp)

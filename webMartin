@@ -19,10 +19,10 @@
 # Default server configuration
 #
 server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
+	listen 80;
+	listen [::]:80;
 
-	root /var/www/mblesaweb/html/statoc-website-example;
+	root /var/www/mblesaweb/html/static-website-example;
 
 	index index.html index.htm index.nginx-debian.html;
 
