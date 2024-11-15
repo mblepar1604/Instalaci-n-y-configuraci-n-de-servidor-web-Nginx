@@ -384,3 +384,12 @@ sudo ln -sf /etc/nginx/sites-available/martinbweb /etc/nginx/sites-enabled/
 
 ![alt text](images/img-3.png)
 
+## Cuestiones finales
+
+### ¿Qué pasa si no hago el link simbólico entre _sites-available_ y _sites-enabled_ de mi sitio web?
+
+- Podrían pasar varias cosas, entre ellas, que el sitio web no esté activo. Debido a esto recibiremos una respuesta genérica por parte del servidor _Nginx_ o bien un error 404.
+
+### ¿Qué pasa si no le doy los permisos adecuados a /var/www/nombre_web?
+
+- El servidor podría no ser capaz de acceder a los archivos, por lo que podría derivar en dos errores, un error 403 o un error 404. También podría conllevar problemas de seguridad así como que el servidor podría no ser capaz de seguir los enlaces simbólicos.
