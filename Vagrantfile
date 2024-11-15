@@ -17,6 +17,7 @@ Vagrant.configure("2") do |config|
 
       # Creación de la carpeta del sitio web
       sudo mkdir -p /var/www/mblesaweb/html
+      sudo mkdir -p /var/www/martinbweb/html
 
       # Dentro de esa carpeta html, clonamos el siguiente repositorio
       cd /var/www/mblesaweb/html
@@ -25,12 +26,19 @@ Vagrant.configure("2") do |config|
       # Ajustamos los permisos de la carpeta
       sudo chown -R www-data:www-data /var/www/mblesaweb/html/static-website-example
       sudo chmod -R 755 /var/www/mblesaweb/html
+      sudo chown -R vagrant:vagrant /var/www/martinbweb/html/
+      sudo chmod -R 755 /var/www/martinbweb/html
+      sudo chown -R vagrant:vagrant /var/www
+      sudo chmod -R 755 /var/www
+
 
       # Pegamos el archivo webMartin
       sudo cp /vagrant/webMartin /etc/nginx/sites-available/mblesaweb
+      sudo cp /vagrant/webBlesa /etc/nginx/sites-available/martinbweb
 
-      # Creamos un archivo simbólico entre el archivo default y los sitios habilitados
+      # Creamos un archivo simbólico entre el archivo los sites y los sitios habilitados
       sudo ln -sf /etc/nginx/sites-available/mblesaweb /etc/nginx/sites-enabled/
+      sudo ln -sf /etc/nginx/sites-available/martinbweb /etc/nginx/sites-enabled/
 
       # Pegamos el archivo hosts
       sudo cp /vagrant/hosts /etc
@@ -39,13 +47,10 @@ Vagrant.configure("2") do |config|
       sudo nginx -t
       sudo systemctl restart nginx
 
-      # Creamos una carpeta en nuestro home (ftp)
-      sudo mkdir -p /home/vagrant/ftp
-
       # Creamos los certificados de seguridad
       sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
       -keyout /etc/ssl/private/vsftpd.key -out /etc/ssl/certs/vsftpd.crt \
-      -subj "/C=ES/ST=Madrid/L=Madrid/O=mblesaweb/CN=mblesaweb.es"
+      -subj "/C=ES/ST=Madrid/L=Madrid/O=mblesaweb/CN=mblesaweb"
 
       # Pegamos el archivo vsftpd.conf
       sudo cp /vagrant/vsftpd.conf /etc

@@ -6,6 +6,7 @@ En esta sección estará todo lo relacionado a la configuración de archivos.
 La estructura ha quedado tal que así:
 
 ```
+
 Vagrant.configure("2") do |config|
 
   config.vm.define "vm1" do |vm1|
@@ -26,6 +27,7 @@ Vagrant.configure("2") do |config|
   end
   
 end
+
 ```
 
 ### Configuración inicial de los archivos de Nginx
@@ -34,7 +36,9 @@ end
 3. Hemos modificado los permisos de las carpetas de tal forma que: 
 - El propietario de la carpeta **html** y de todo el contenido de ella sea _www-data_
 - Le daremos los permisos adecuados para evitar errores de acceso **no autorizados**
+
 ```
+
 # Instalación del servicio Nginx y configuración de este
     vm1.vm.provision "shell", inline: <<-SHELL
 
@@ -54,14 +58,18 @@ end
       sudo chmod -R 755 /var/www/mblesaweb
 
     SHELL
+
 ```
+
 ### Configuración del archivo default de Nginx
 1. Hemos sacado el archivo default de _/etc/nginx/sites-available_ para su configuración
 2. Hemos configurado el archivo _default_ en función de las especificaciones requeridas para nuestra web
 3. Hemos copiado el archivo _default_ en la máquina virtual tras su configuración
 4. Hemos creado un archivo simbólico entre el archivo _default_ y los sitios habilitados
 - El archivo default:
+
 ```
+
 server {
 	listen 80 default_server;
 	listen [::]:80 default_server;
@@ -79,9 +87,13 @@ server {
 		try_files $uri $uri/ =404;
 	}
 }
+
 ```
+
 - El archivo vagrantfile:
+
 ```
+
 # Instalación del servicio Nginx y configuración de este
     vm1.vm.provision "shell", inline: <<-SHELL
 
@@ -107,26 +119,31 @@ server {
       sudo ln -s /etc/nginx/sites-available/ /etc/nginx/sites-enabled/
 
     SHELL
+
 ```
 
 ## Comprobaciones de Nginx
 ### Comprobación del correcto funcionamiento
-Como no poseemos **DNS**, lo haremos de forma manual. Vamos a editar el archivo _/etc/hosts_ de nuestra máquina virtual
-para que asocie la IP de esta a nuestro **server_name**. Para ello:
+Como no poseemos **DNS**, lo haremos de forma manual. Vamos a editar el archivo _/etc/hosts_ de nuestra máquina virtual para que asocie la IP de esta a nuestro **server_name**. Para ello:
 1. Sacaremos el archivo a nuestro repositorio local mediante: _sudo cp /etc/hosts /vagrant_
 2. Le añadiremos la siguiente linea: _192.168.57.15 mblesaweb_
 3. Pegamos el archivo hosts de nuevo a la máquina virtual mediante: _sudo cp /vagrant/hosts /etc_
 - En el archivo hosts:
+
 ```
+
 127.0.0.1	localhost
 127.0.0.2	bookworm
 ::1		localhost ip6-localhost ip6-loopback
 ff02::1		ip6-allnodes
 ff02::2		ip6-allrouters
 192.168.57.15 mblesaweb
+
 ```
 - En el archivo vagrantfile:
+
 ```
+
 # Instalación del servicio Nginx y configuración de este
     vm1.vm.provision "shell", inline: <<-SHELL
 
@@ -155,14 +172,16 @@ ff02::2		ip6-allrouters
       sudo cp /vagrant/hosts /etc
 
     SHELL
+
 ```
 ## FTPS
 En esta sección veremos toda la configuración relacionada al servidor **FTPS**
 ### Instalación y preparación inicial del servidor FTPS
 1. Instalamos el servicio FTPS: _vsftpd_
-2. Creamos una carpeta en nuestro home para el servicio.
-3. Creamos los certificados de seguridad necesarios
+2. Creamos los certificados de seguridad necesarios
+
 ```
+
 # Instalación del servicio Nginx y configuración de este
     vm1.vm.provision "shell", inline: <<-SHELL
 
@@ -201,17 +220,24 @@ En esta sección veremos toda la configuración relacionada al servidor **FTPS**
       -subj "/C=ES/ST=Madrid/L=Madrid/O=mblesaweb/CN=mblesaweb.es"
 
     SHELL
+
 ```
 ### Configuración del servidor FTPS
 1. Sacamos el archivo _/etc/vsftpd.conf_ para su modificación
 2. Sustituiremos las siguientes líneas:
+
 ```
+
 rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
 rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
 ssl_enable=NO
+
 ```
+
 Por las siguientes:
+
 ```
+
 rsa_cert_file=/etc/ssl/certs/vsftpd.crt
 rsa_private_key_file=/etc/ssl/private/vsftpd.key
 ssl_enable=YES
@@ -223,10 +249,19 @@ ssl_sslv2=NO
 ssl_sslv3=NO
 require_ssl_reuse=NO
 ssl_ciphers=HIGH
-local_root=/home/nombre_usuario/ftp
+
+local_root=/var/www
+
+write_enable=YES
+local_enable=YES
+chroot_local_user=YES
+allow_writeable_chroot=YES
+
 ```
 3. Pegamos el archivo ya modificado y **reiniciamos** el servicio
+
 ```
+
 # Instalación del servicio Nginx y configuración de este
     vm1.vm.provision "shell", inline: <<-SHELL
 
@@ -271,4 +306,81 @@ local_root=/home/nombre_usuario/ftp
       sudo systemctl restart vsftpd
 
     SHELL
+
 ```
+
+### Comprobación de conexión al servidor ftp
+1. Comprobaremos que podemos acceder al servidor mediante una conexión FTP sin cifrar en el puerto 21
+
+![alt text](images/img-1.png)
+
+## Tarea
+
+En esta sección configuraremos un nuevo dominio para un sitio web que he desarrollado. Transfiriendo los archivos mediante FTPES a Debian.
+
+Nuestro archivo estará en la carpeta _var/www/_ y le daremos los permisos adecuados, de forma similar a como hemos hecho anteriormente.
+
+Para ello: 
+1. **Copiaremos** el archivo **webMartin** y lo pegaremos en la misma carpeta como **webBlesa**. Le daremos la siguiente configuración (además de pegarlo en la máquina virtual):
+```
+
+server {
+	listen 80;
+	listen [::]:80;
+
+	root /var/www/martinbweb/html/static-website-example;
+
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name martinbweb;
+
+	location / {
+		try_files $uri $uri/ =404;
+	}
+}
+
+```
+
+```
+
+# Pegamos el archivo webMartin
+sudo cp /vagrant/webMartin /etc/nginx/sites-available/mblesaweb
+sudo cp /vagrant/webBlesa /etc/nginx/sites-available/martinbweb
+
+```
+
+2. **Crearemos** la carpeta **martinbweb/html** en _/var/www_ para insertar el archivo **webBlesa** y diferenciarlo del anterior. Además, le daremos los permisos correspondientes a esta.
+```
+
+# Creación de la carpeta del sitio web
+sudo mkdir -p /var/www/mblesaweb/html
+sudo mkdir -p /var/www/martinbweb/html
+
+```
+
+```
+
+# Ajustamos los permisos de la carpeta
+sudo chown -R www-data:www-data /var/www/mblesaweb/html/static-website-example
+sudo chmod -R 755 /var/www/mblesaweb/html
+sudo chown -R vagrant:vagrant /var/www/martinbweb/html/
+sudo chmod -R 755 /var/www/martinbweb/html
+
+```
+
+3. **Creamos** el **archivo simbolico** entre el sitio web y los sitios habilitados
+
+```
+
+# Creamos un archivo simbólico entre el archivo los sites y los sitios habilitados
+sudo ln -sf /etc/nginx/sites-available/mblesaweb /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/martinbweb /etc/nginx/sites-enabled/
+
+```
+
+4. **Pegamos** los archivos desde **Filezilla** a la máquina virtual
+
+![alt text](images/img-2.png)
+
+![alt text](images/img-3.png)
+
