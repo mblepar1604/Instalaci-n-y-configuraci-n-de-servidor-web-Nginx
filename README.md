@@ -508,8 +508,53 @@ server {
 
 ![alt text](images/autenticacion-cancelada.png)
 
-## Tareas
+## Tareas Parte 1
 
 ### Tarea 1
 
-Se intentará entrar primero con un usuario correcto y otro incorrecto, seguidamente se procederá a ver los registros de esos logs
+Se intentará entrar primero con un usuario correcto y otro incorrecto, seguidamente se procederá a ver los registros de esos logs.
+
+Para ello usaremos _sudo tail -f /var/log/nginx/error.log_ y _sudo tail -f /var/log/nginx/access.log_
+
+1. Los errores:
+
+![alt text](images/errorlog.png)
+
+2. Los accesos:
+
+![alt text](images/accesslog.png)
+
+### Tarea 2
+
+Vamos a probar a aplicar autenticación sólo a una parte de la web. Vamos a intentar
+que sólo se necesite autenticacíón para entrar a la parte de **TEAM**. Para ello:
+
+1. Modificaremos el archivo de configuracion de *martinbweb* para que solo aplique la autenticación a team.html:
+
+```
+
+server {
+	listen 80;
+	listen [::]:80;
+
+	root /var/www/martinbweb/html/;
+
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name martinbweb;
+
+	location /team.html {
+		auth_basic "Área restringida";
+		auth_basic_user_file /etc/nginx/.htpasswd;
+		try_files $uri $uri/ =404;
+	}
+}
+
+```
+
+2. Comprobamos que pida autenticación para acceder a la página de team.html:
+
+![alt text](images/team-access.png)
+
+## Combinación de la autenticación básica con la restricción de acceso por IP
+
