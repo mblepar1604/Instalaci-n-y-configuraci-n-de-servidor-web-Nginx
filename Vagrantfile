@@ -64,14 +64,26 @@ Vagrant.configure("2") do |config|
 
       # Guardamos nuestros usuario en el archivo htpasswd y creamos un password cifrado para estos
       sudo sh -c "echo -n 'martin:' > /etc/nginx/.htpasswd"
-      sudo sh -c "openssl passwd -apr1 'martin' >> /etc/nginx/.htpasswd"
+      sudo sh -c "openssl passwd -apr1 'martin' >> /etc/nginx/.htpasswd_martin"
 
       sudo sh -c "echo -n 'blesa:' >> /etc/nginx/.htpasswd"
       sudo sh -c "openssl passwd -apr1 'blesa' >> /etc/nginx/.htpasswd"
+
+      # Guardamos dos usuarios para acceso exclusivo posteriormente
+      sudo sh -c "echo -n 'martin:' > /etc/nginx/.htpasswd_martin"
+      sudo sh -c "openssl passwd -apr1 'martin' >> /etc/nginx/.htpasswd_martin"
+
+      sudo sh -c "echo -n 'martin:' > /etc/nginx/.htpasswd_martinpardo"
+      sudo sh -c "openssl passwd -apr1 'martin' >> /etc/nginx/.htpasswd_martinpardo"
+
+      sudo sh -c "echo -n 'pardo:' >> /etc/nginx/.htpasswd_martinpardo"
+      sudo sh -c "openssl passwd -apr1 'pardo' >> /etc/nginx/.htpasswd_martinpardo"
       
 
       # Sacamos el archivo a la carpeta vagrant para mayor facilidad en la comprobación
       cp /etc/nginx/.htpasswd /vagrant
+      cp /etc/nginx/.htpasswd_martin /vagrant
+      cp /etc/nginx/.htpasswd_martinpardo /vagrant
 
     SHELL
 

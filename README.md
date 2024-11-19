@@ -558,3 +558,92 @@ server {
 
 ## Combinación de la autenticación básica con la restricción de acceso por IP
 
+En esta sección configuraremos nuestra configuración de _nginx_ para que no deje acceder con la IP de la máquina anfitriona al directorio raíz de una de mis dos web. La web elegida para este apartado será *mblesaweb*.
+
+Para ello, en el archivo de configuración tendrá la siguiente estructura:
+
+```
+
+server {
+	listen 80;
+	listen [::]:80;
+
+	root /var/www/mblesaweb/html/static-website-example;
+
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name mblesaweb;
+
+	location / {
+		satisfy all;
+		deny 192.168.57.1;
+
+		auth_basic "Área restringida";
+		auth_basic_user_file /etc/nginx/.htpasswd;
+		try_files $uri $uri/ =404;
+	}
+}
+
+```
+
+## Tareas Parte 2
+
+### Tarea 3
+
+Comprobar como deniega el acceso a la página de **mblesaweb** debido a la **IP restringida**. Para ello muestra:
+
+1. Mensaje de error en el navegador
+
+![alt text](images/ip-error-nav.png)
+
+2. Mensaje de error de _error.log_
+
+![alt text](images/ip-error-log.png)
+
+### Tarea 4
+
+Configura Nginx para que desde tu máquina anfitriona se tenga que tener tanto una IP válida como
+un usuario válido, ambas cosas a la vez, y comprueba que sí puede acceder sin problemas. Para ello:
+
+1. Modificaremos el archivo de configuración de **martinbweb** para denegar el acceso a todas las IP menos la de la máquina anfitriona.
+
+```
+
+server {
+	listen 80;
+	listen [::]:80;
+
+	root /var/www/martinbweb/html/;
+
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name martinbweb;
+
+	location / {
+		satisfy all;
+		allow 192.168.57.1;
+		deny all;
+
+		auth_basic "Área restringida";
+		auth_basic_user_file /etc/nginx/.htpasswd_martinpardo;
+		try_files $uri $uri/ =404;
+	}
+
+	location /team.html {
+		satisfy all;
+		allow 192.168.57.1;
+		deny all;
+
+		auth_basic "Área restringida";
+		auth_basic_user_file /etc/nginx/.htpasswd_martin;
+		try_files $uri $uri/ =404;
+	}
+}
+
+```
+
+2. Comprobar que se puede acceder sin problemas con el usuario y la IP válidas. Los usuarios validos serán **pardo** y **martin**.
+
+![alt text](images/pardo-log-martinbweb.png)
+
+![alt text](images/pardo-martinbweb-access.png)
