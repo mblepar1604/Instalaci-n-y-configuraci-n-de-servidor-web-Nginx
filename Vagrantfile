@@ -16,6 +16,7 @@ Vagrant.configure("2") do |config|
       sudo apt-get install -y nginx
       sudo apt-get install -y git
       sudo apt-get install -y vsftpd
+      sudo apt-get install -y ufw
 
       # Creación de la carpeta del sitio web
       sudo mkdir -p /var/www/mblesaweb/html
@@ -84,6 +85,20 @@ Vagrant.configure("2") do |config|
       cp /etc/nginx/.htpasswd /vagrant
       cp /etc/nginx/.htpasswd_martin /vagrant
       cp /etc/nginx/.htpasswd_martinpardo /vagrant
+
+      # Activamos el perfil para permitir trafico HTTPS
+      sudo ufw allow ssh
+      sudo ufw allow 'Nginx Full'
+      sudo ufw delete allow 'Nginx HTTP'
+
+      # Activamos el cortafuegos
+      sudo ufw --force enable
+
+      # Creamos la clave SSL y el certificado
+      sudo openssl req -x509 -nodes -days 365 \ -newkey rsa:2048 -keyout /etc/ssl/private/martinbweb.com.key \ -out /etc/ssl/certs/martinbweb.com.crt 
+
+      # Reiniciamos el servicio Nginx
+      sudo systemctl reload nginx
 
     SHELL
 

@@ -647,3 +647,82 @@ server {
 ![alt text](images/pardo-log-martinbweb.png)
 
 ![alt text](images/pardo-martinbweb-access.png)
+
+# Acceso seguro con Nginx
+
+## Introducción
+
+El acceso seguro mediante certificados TLS/SSL es una obligación en cualquier sitio web que se
+precie al que queramos acceder.
+
+### Prerequisitos
+
+Necesitaremos un nombre de servidor y un registro DNS para nuestro servidor.
+
+Para ello en el archivo hosts:
+
+```
+
+192.168.57.15 martinbweb.com
+192.168.57.15 www.martinbweb.com
+
+```
+
+## Configuración de Nginx
+
+Utilizaremos de base nuestro site **martinbweb** para la configuración
+
+### Nombre del servidor
+
+Cambiaremos la configuración para que el nuevo nombre de servidor sea **martinbweb.com** y **www.martinbweb.com**. La linea ha de quedar tal que así:
+
+```
+
+server_name martinbweb.com www.martinbweb.com;
+
+```
+
+## Configuración del cortafuegos
+
+1. Instalaremos _ufw_. Para ello en el **Vagrantfile**:
+
+```
+
+sudo apt-get install -y ufw
+
+```
+
+2. Activamos el perfil para permitir trafico HTTPS:
+
+```
+
+sudo ufw allow ssh
+sudo ufw allow 'Nginx Full'
+sudo ufw delete allow 'Nginx HTTP'
+
+# Activamos el cortafuegos
+sudo ufw --force enable
+
+```
+
+
+## Generación de un certificado autofirmado
+
+Crearemos la **clave SSL** y el certificado con el comando _openssl_.
+
+```
+
+sudo openssl req -x509 -nodes -days 365 \ -newkey rsa:2048 -keyout /etc/ssl/private/martinbweb.com.key \ -out /etc/ssl/certs/martinbweb.com.crt 
+
+# Reiniciamos el servicio Nginx
+sudo systemctl reload nginx
+
+```
+
+## Configuración
+
+Modificaremos el archivo de configuración del sitio:
+
+```
+
+```
