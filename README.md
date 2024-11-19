@@ -393,3 +393,123 @@ sudo ln -sf /etc/nginx/sites-available/martinbweb /etc/nginx/sites-enabled/
 ### ¿Qué pasa si no le doy los permisos adecuados a /var/www/nombre_web?
 
 - El servidor podría no ser capaz de acceder a los archivos, por lo que podría derivar en dos errores, un error 403 o un error 404. También podría conllevar problemas de seguridad así como que el servidor podría no ser capaz de seguir los enlaces simbólicos.
+
+# Autenticación en Nginx
+
+## Preparación del entorno
+
+Para la **autenticación** necesitaremos el paquete **openssl**, para comprobar que lo tenemos instalado:
+
+```
+
+dpkg -l | grep openssl
+
+```
+
+Yo ya lo tengo instalado, pero en el caso contrario se instalaría mediante:
+
+```
+
+sudo apt-get install openssl
+
+```
+
+## Creación de usuarios y contraseñas para el acceso web
+
+1. Crearemos un archivo oculto llamado **.htpasswd** en el directorio de configuración _/etc/nginx_. Ahí guardaremos nuestros usuarios y contraseñas.
+
+```
+
+# Guardamos nuestros usuario en el archivo htpasswd y creamos un password cifrado para estos
+sudo sh -c "echo -n 'martin:' > /etc/nginx/.htpasswd"
+sudo sh -c "openssl passwd -apr1 'martin' >> /etc/nginx/.htpasswd"
+
+sudo sh -c "echo -n 'blesa:' >> /etc/nginx/.htpasswd"
+sudo sh -c "openssl passwd -apr1 'blesa' >> /etc/nginx/.htpasswd"
+      
+
+# Sacamos el archivo a la carpeta vagrant para mayor facilidad en la comprobación
+cp /etc/nginx/.htpasswd /vagrant
+
+```
+
+2. Comprobamos que el archivo contiene los usuarios que nos interesan:
+
+```
+
+martin:$apr1$CB5bYrUj$QeuSb6qU1pLDYGo2JZGF5/
+blesa:$apr1$RJddWFKk$3l.i.wKz20gLRD9pSu4hj1
+
+```
+
+## Configuración del servidor Nginx para usar autenticación básica
+
+### Configuración de archivos
+
+Modificaremos la configuración del sitio web para indicarle que use la autenticación básica:
+
+1. En mblesaweb:
+
+```
+
+server {
+	listen 80;
+	listen [::]:80;
+
+	root /var/www/mblesaweb/html/static-website-example;
+
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name mblesaweb;
+
+	location / {
+		auth_basic "Área restringida";
+		auth_basic_user_file /etc/nginx/.htpasswd;
+		try_files $uri $uri/ =404;
+	}
+}
+
+```
+
+2. En martinbweb:
+
+```
+
+server {
+	listen 80;
+	listen [::]:80;
+
+	root /var/www/martinbweb/html/;
+
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name martinbweb;
+
+	location / {
+		auth_basic "Área restringida";
+		auth_basic_user_file /etc/nginx/.htpasswd;
+		try_files $uri $uri/ =404;
+	}
+}
+
+```
+
+### Comprobación de la autenticación
+
+1. Para mblesaweb:
+
+![alt text](images/autenticacion-mblesaweb.png)
+
+2. Para martinbweb:
+
+![alt text](images/autenticacion-martinbweb.png)
+
+3. Para el mensaje de error:
+
+![alt text](images/autenticacion-cancelada.png)
+
+## Tareas
+
+### Tarea 1
+
+Se intentará entrar primero con un usuario correcto y otro incorrecto, seguidamente se procederá a ver los registros de esos logs

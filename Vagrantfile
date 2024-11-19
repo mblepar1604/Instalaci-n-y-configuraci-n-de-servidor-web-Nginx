@@ -10,6 +10,8 @@ Vagrant.configure("2") do |config|
     # Instalación del servicio Nginx y configuración de este
     vm1.vm.provision "shell", inline: <<-SHELL
 
+    #  -------------- INSTALACION --------------  
+
       sudo apt-get update
       sudo apt-get install -y nginx
       sudo apt-get install -y git
@@ -57,6 +59,19 @@ Vagrant.configure("2") do |config|
 
       # Reiniciamos el servicio
       sudo systemctl restart vsftpd
+
+      #  -------------- AUTENTICACION --------------  
+
+      # Guardamos nuestros usuario en el archivo htpasswd y creamos un password cifrado para estos
+      sudo sh -c "echo -n 'martin:' > /etc/nginx/.htpasswd"
+      sudo sh -c "openssl passwd -apr1 'martin' >> /etc/nginx/.htpasswd"
+
+      sudo sh -c "echo -n 'blesa:' >> /etc/nginx/.htpasswd"
+      sudo sh -c "openssl passwd -apr1 'blesa' >> /etc/nginx/.htpasswd"
+      
+
+      # Sacamos el archivo a la carpeta vagrant para mayor facilidad en la comprobación
+      cp /etc/nginx/.htpasswd /vagrant
 
     SHELL
 
