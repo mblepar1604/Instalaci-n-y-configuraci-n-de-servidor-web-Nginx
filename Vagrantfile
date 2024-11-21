@@ -95,7 +95,14 @@ Vagrant.configure("2") do |config|
       sudo ufw --force enable
 
       # Creamos la clave SSL y el certificado
-      sudo openssl req -x509 -nodes -days 365 \ -newkey rsa:2048 -keyout /etc/ssl/private/martinbweb.com.key \ -out /etc/ssl/certs/martinbweb.com.crt 
+      sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/martinbweb.com.key -out /etc/ssl/certs/martinbweb.com.crt -subj "/C=ES/CN=mblesaweb.com/"
+
+      # Le damos los permisos
+      sudo chmod 644 /etc/ssl/certs/martinbweb.com.crt
+      sudo chmod 600 /etc/ssl/private/martinbweb.com.key
+      sudo chown root:root /etc/ssl/certs/martinbweb.com.crt
+      sudo chown root:root /etc/ssl/private/martinbweb.com.key
+
 
       # Reiniciamos el servicio Nginx
       sudo systemctl reload nginx

@@ -708,11 +708,18 @@ sudo ufw --force enable
 
 ## Generación de un certificado autofirmado
 
-Crearemos la **clave SSL** y el certificado con el comando _openssl_.
+Crearemos la **clave SSL** y el certificado con el comando _openssl_ y le damos los permisos necesarios.
 
 ```
 
-sudo openssl req -x509 -nodes -days 365 \ -newkey rsa:2048 -keyout /etc/ssl/private/martinbweb.com.key \ -out /etc/ssl/certs/martinbweb.com.crt 
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \ 
+-keyout /etc/ssl/private/martinbweb.com.key \ 
+-out /etc/ssl/certs/martinbweb.com.crt \
+-subj "/C=ES/CN=mblesaweb/"
+
+# Le damos los permisos
+sudo chmod 600 /etc/ssl/private/martinbweb.com.key
+sudo chown root:root /etc/ssl/private/martinbweb.com.key
 
 # Reiniciamos el servicio Nginx
 sudo systemctl reload nginx
@@ -725,4 +732,67 @@ Modificaremos el archivo de configuración del sitio:
 
 ```
 
+server {
+	listen 80;
+	listen [::]:80;
+	server_name martinbweb.com www.martinbweb.com;
+
+	return 301 https://$host$request_uri;
+}
+
+
+server {
+	listen 443 ssl;
+	listen [::]:443 ssl;
+
+
+	root /var/www/martinbweb/html/;
+
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name martinbweb.com www.martinbweb.com;
+
+	ssl_certificate /etc/ssl/certs/martinbweb.com.crt;
+	ssl_certificate_key /etc/ssl/private/martinbweb.com.key;
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+	ssl_ciphers HIGH:!aNULL:!MD5;
+
+	add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+
+	location / {
+		satisfy all;
+		allow 192.168.57.1;
+		deny all;
+
+		auth_basic "Área restringida";
+		auth_basic_user_file /etc/nginx/.htpasswd_martinpardo;
+		try_files $uri $uri/ =404;
+	}
+
+	location /team.html {
+		satisfy all;
+		allow 192.168.57.1;
+		deny all;
+
+		auth_basic "Área restringida";
+		auth_basic_user_file /etc/nginx/.htpasswd_martin;
+		try_files $uri $uri/ =404;
+	}
+}
+
 ```
+
+## Prueba
+
+Accederemos a la página web y comprobaremos el resultado
+
+1. Captura de pantalla de la página web con certificado:
+
+![alt text](images/certificado.png)
+
+2. Le damos a _"Continuar a martinbweb.com (no seguro)"_ y comprobamos que podemos entrar:
+
+![alt text](images/https-atenticacion.png)
+
+![alt text](images/https-in.png)
